@@ -36,6 +36,11 @@ server_port = 626
 server_ip = ""
 
 
+## custom exception classes
+class PermissionError (Exception):
+    """This """
+
+
 ##----HELPER FUNCTIONS----##
 
 # usage to show arguments
@@ -121,8 +126,8 @@ def recv_data (sock):
 
 # get commandline arguments
 def parse_args ():
-    # returns args = [is_new, "record_name record_value record_type" else 0,
-    #                 record_name else 0, vault_name, port else 0, server_ip]
+    # returns args = [is_new, "[record_name [record_value record_type]] is_delete" else 0,
+    #                 vault_name, port else 0, server_ip]
     args = [0 for _ in range(5)]
 
     try:
@@ -131,9 +136,11 @@ def parse_args ():
                 args[0] = 1
             elif argv[arg] == "-s":
                 to_encrypt = read_file(argv[arg+2]) if "file" in argv[arg+3].lower() else argv[arg+2]
-                args[1] = ' '.join([argv[arg+1].strip(), '`'+to_encrypt+'`'])
+                args[1] = argv[arg+1].strip() + '`'+to_encrypt+'`' + '0'
             elif argv[arg] == "-g":
-                args[1] = argv[arg+1].strip()
+                args[1] = argv[arg+1].strip() + '0'
+            elif argv[arg] == "-d":
+                args[1] = (argv[arg+1].strip() if arg[arg+1].strip()[0] != '-' else '') + '1'
             elif argv[arg] == "-p":
                 args[3] = argv[arg+1].strip()
             elif argv[arg] == "-h":
