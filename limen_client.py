@@ -42,16 +42,18 @@ server_ip = ""
 def usage ():
     print("""
 
-        ./limen_client.py [-n] [-s record_name record_value record_type]
-            [-g record_name] [-p port] [-h server_ip] vault_name
+        ./limen_client.py [-n] [-s record_name record_value record_type,
+             -g record_name, -d record_name] [-p port] [-h server_ip] vault_name
 
-        -n  |  New: Start a new vault stored in the specified vault_name
-                    NOTE: You must create a vault before adding any records
-        -s  |  Set: Add a new encrypted record (record_name) with the value 
-                    (record_value) of type (record_type) 'string' or 'file'
-        -g  |  Get: Retrieve a record (record_name) from a vault (vault_name)
-        -p  |  Server port to connect to (default is 626)
-        -h  |  Server hostname or IP address to connect to
+        -n   |  New: Start a new vault stored in the specified vault_name
+                     NOTE: You must create a vault before adding any records
+        -s   |  Set: Add a new encrypted record or update an old one (record_name) with the value 
+                     (record_value) of type (record_type) 'string' or 'file'
+        -g   |  Get: Retrieve a record (record_name) from a vault (vault_name)
+        -d   |  Delete: Delete a record (record_name) from a vault (vault_name)
+                        If record_name is left blank, the entire vault will be deleted.
+        -p   |  Server port to connect to (default is 626)
+        -h   |  Server hostname or IP address to connect to
 
         """)
 
