@@ -4,13 +4,15 @@
 This is the server side script that will receive the bare arguments from a
 client and add new vaults, add new records, or get previously stored records.
 Each connection should send data like so:
-    is_new_vault;record_name record_value;raw_key;vault_name
+    is_new_vault;record_name record_value;raw_key;vault_name;mode
 
 is_new_vault :  denotes if the user would like to create a new vault
 record_name  :  the record name the user would like to access from the vault
 record_value :  if supplied, it will add the record to the vault
 raw_key      :  the password to the vault for authentication
 vault_name   :  the vault to be accessed
+mode         :  can be either 'read' or 'delete'
+                denotes if the user would like to read record or delete the record/vault
 
 NOTE: raw password transmission is not ideal but should be secure since we are
       communicating over SSL.
