@@ -4,7 +4,7 @@
 This is the client side script that receives arguments and queries the server
 accordingly to retrieve or add data to the specified vaults.
 Each connection should send data like so: 
-    is_new_vault;record_name record_value;raw_key;vault_name
+    is_new_vault;record_name record_value;raw_key;vault_name;is_delete
 
 is_new_vault :  denotes if the user would like to create a new vault
 record_name  :  the record name the user would like to access from the vault
