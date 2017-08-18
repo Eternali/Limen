@@ -4,15 +4,15 @@
 This is the server side script that will receive the bare arguments from a
 client and add new vaults, add new records, or get previously stored records.
 Each connection should send data like so:
-    is_new_vault;record_name record_value;raw_key;vault_name;mode
+    is_new_vault;record_name`record_value`is_delete;raw_key;vault_name
 
 is_new_vault :  denotes if the user would like to create a new vault
 record_name  :  the record name the user would like to access from the vault
 record_value :  if supplied, it will add the record to the vault
+is_delete    :  can be either '0' or '1'
+                denotes if the user would like to read record or delete the record/vault
 raw_key      :  the password to the vault for authentication
 vault_name   :  the vault to be accessed
-mode         :  can be either 'read' or 'delete'
-                denotes if the user would like to read record or delete the record/vault
 
 NOTE: raw password transmission is not ideal but should be secure since we are
       communicating over SSL.
@@ -203,6 +203,10 @@ def get_record (record_name, vault, encrypter, directory=MAINDIR+STOREDIR):
             write_log("Record not found in desired vault!")
 
 
+def del_record (record_name):
+
+
+
 # get commandline arguments
 def parse_args ():
     # returns args = [port_to_listen_on, max_connections]
@@ -239,7 +243,7 @@ def handle_request (sock):
         return False
     # if the length of the second argument is > 1 then it is adding a record
     encrypter = AESCipher(args[2])
-    if len(args[1].strip().split(' ', 1)) > 1:
+    if len(args[1].strip().split(' ', 1)) > 2:
         add_record(args[1].strip().split(' '), args[3], encrypter)
         return "Updated '" + args[1].strip().split(' ', 1)[0] + "' successfully!"
     elif len(args[1].strip().split(' ')) == 1:
