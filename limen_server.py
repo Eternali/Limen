@@ -203,8 +203,19 @@ def get_record (record_name, vault, encrypter, directory=MAINDIR+STOREDIR):
             write_log("Record not found in desired vault!")
 
 
-def del_record (name, is_vault):
-    pass
+def del_record (name, vault, directory=MAINDIR+STOREDIR, cur_config=None):
+    if not name and cur_config:
+        os.system("rm -rf %s" % (directory+name))
+        index = cur_config["vaults"].index(name)
+        del cur_config["vaults"][index]
+        del cur_config["keys"][index]
+        del cur_config["salts"][index]
+    elif name and not cur_config:
+        vault_content = {}
+        for record in read_file(directory+vault):
+            
+    else:
+        raise ValueError
 
 
 # get commandline arguments
