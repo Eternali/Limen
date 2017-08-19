@@ -163,8 +163,6 @@ def main ():
     raw_key = getpass.getpass()
     args.insert(2, raw_key)
 
-    print(';'.join([str(a) for a in args[:4]]))
-
     # initialize socket and connect to server
     conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
