@@ -211,9 +211,11 @@ def del_record (name, vault, directory=MAINDIR+STOREDIR, cur_config=None):
         del cur_config["keys"][index]
         del cur_config["salts"][index]
     elif name and not cur_config:
-        vault_content = {}
-        for record in read_file(directory+vault):
-            
+        records = read_file(directory+vault).split(';')
+        for r, record in enumerate(records):
+            if record and name == record.split(':')[0]:
+                del records[r]
+                return write_file(directory+vault, records)
     else:
         raise ValueError
 
