@@ -61,7 +61,8 @@ def usage ():
         ./limen_server.py [-p listen_port] [-m maximum_connections]
 
         -p  |  port : specify the port to listen on (default is 626)
-        -m  |  maximum concurrent connections : the maximum number of machines that can connect to the service at the same time (default is 1)
+        -m  |  maximum concurrent connections : the maximum number of machines that
+               can connect to the service at the same time (default is 1)
 
         """)
 
@@ -241,7 +242,7 @@ def parse_args ():
 # handle the client
 def handle_request (sock):
     # receive data (reminder, format is:
-    # is_new_vault;record_name record_value is_delete;raw_key;vault_name)
+    # is_new_vault;record_name`record_value`is_delete;raw_key;vault_name)
     args = recv_data(sock).strip().split(';')
     # first get the current configuration
     config = get_config()
@@ -257,7 +258,7 @@ def handle_request (sock):
     # if the length of the second argument is > 1 then it is adding a record
     encrypter = AESCipher(args[2])
     if len(args[1].strip().split(' ')) > 2:
-        add_record(args[1].strip().split(' ', 1)[-1].rsplit(' ', 1)[0], args[3], encrypter)
+        add_record(args[1].strip().split('`')[1].rsplit(' ', 1)[0], args[3], encrypter)
         return "Updated '" + args[1].strip().split(' ', 1)[0] + "' successfully!"
     elif len(args[1].strip().split(' ')) == 2 and args[1].strip().split(' ')[-1] == '0':
         return "The value stored in '" + args[1].strip() + "' is :  " \
