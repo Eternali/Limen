@@ -29,7 +29,7 @@ from sys import argv
 
 # configuration
 MAINDIR = "/etc/limen/"
-LOGNAME = "limen.log"
+LOGNAME = "limen_cli.log"
 
 # server setup configuration
 server_port = 626
@@ -169,6 +169,7 @@ def main ():
         conn.connect((args[5], args[4] if args[4] else server_port))
         write_log("[**] Connected to %s:%s." % (args[5], args[4] if args[4] else server_port))
         send_data(conn, ';'.join([str(a) for a in args[:4]]))
+        # print(';'.join([str(a) for a in args[:4]]))
         response = recv_data(conn)
     except Exception:
         write_log("[!!] Failed to connect to %s:%s." % (args[5], args[4] if args[4] else server_port))
@@ -181,3 +182,4 @@ if __name__ == "__main__":
     main()
 
 
+LOGNAME

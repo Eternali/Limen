@@ -36,7 +36,7 @@ from AESCipher import AESCipher
 MAINDIR = "/etc/limen/"
 STOREDIR = "vaults/"
 CONFNAME = "limen.conf"
-LOGNAME = "limen.log"
+LOGNAME = "limen_serv.log"
 
 # salt generation
 CHARCHOICES = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@\#$%^&*()-_+=[]{}~`\\<>.?/|"
@@ -115,7 +115,7 @@ def send_data (sock, data, attempts=3):
             return
         except:
             pass
-    write_log("Failed to update your vault", is_input_err=False)
+    write_log("An internal error occurred.", is_input_err=False)
 
 
 # receive data over socket
@@ -196,12 +196,14 @@ def add_record (record_info, vault, encrypter, directory=MAINDIR+STOREDIR):
 def get_record (record_name, vault, encrypter, directory=MAINDIR+STOREDIR):
     vault_content = {}
     for record in read_file(directory+vault).split(';'):
+        print(record)
         if record:
             vault_content[record.split(':')[0]] = record.split(':')[1]
         if record_name in vault_content.keys():
             return encrypter.decrypt(vault_content[record_name].encode("utf-8"))
         else:
             write_log("Record not found in desired vault!")
+            return "Record not found in desired vault!"
 
 
 def del_record (name, vault, directory=MAINDIR+STOREDIR, cur_config=None):
@@ -227,6 +229,8 @@ def parse_args ():
     args = [0 for _ in range(2)]
     try:
         for i, arg in enumerate(argv[1:]):
+            if arg == "-h" or arg == "--help":
+                usage()
             if arg == "-p":
                 args[0] = int(argv[i+1].strip())
             elif arg == "-m":
@@ -241,7 +245,7 @@ def parse_args ():
 
 # handle the client
 def handle_request (sock):
-    # receive data (reminder, format is:
+    # receive data (format is:
     # is_new_vault;record_name`record_value`is_delete;raw_key;vault_name)
     args = recv_data(sock).strip().split(';')
     # first get the current configuration
@@ -254,16 +258,16 @@ def handle_request (sock):
     # if not then check the password is correct
     index = config["vaults"].index(args[3])
     if hash_key(args[2], config["salts"][index])[0] != config["keys"][index]:
-        return False
+        return "Invalid password!"
     # if the length of the second argument is > 1 then it is adding a record
-    encrypter = AESCipher(args[2])
-    if len(args[1].strip().split(' ')) > 2:
-        add_record(args[1].strip().split('`')[1].rsplit(' ', 1)[0], args[3], encrypter)
-        return "Updated '" + args[1].strip().split(' ', 1)[0] + "' successfully!"
-    elif len(args[1].strip().split(' ')) == 2 and args[1].strip().split(' ')[-1] == '0':
-        return "The value stored in '" + args[1].strip() + "' is :  " \
-                + get_record(args[1].strip(), args[3], encrypter)
-    elif args[1].strip().split(' ')[-1] == '1':
+    encrypter = AESCipher(args[2] + config["salts"][index])
+    if len(args[1].strip().split('`')) > 2:
+        add_record(args[1].strip().split('`')[1], args[3], encrypter)
+        return "Updated '" + args[1].strip().split('`', 1)[0] + "' successfully!"
+    elif args[1].strip()[-1] == '0':
+        return "The value stored in '" + args[1].strip()[:-1] + "' is :  " \
+                + get_record(args[1].strip()[:-1], args[3], encrypter)
+    elif args[1].strip()[-1] == '1':
         del_record(args[1].strip().split(' ')[0], False) if [1].strip().split(' ')[0] != '1' else del_record(args[3], True)
         return (args[1].strip().split(' ')[0] if args[1].strip().split(' ')[0] != '1' else args[3]) + "has been removed."
 
@@ -278,8 +282,8 @@ def main ():
         print("Must be run with root permissions!")
         return
     # get commandline arguments
-    args = parse_args()
-    port, max_conns = args[0] if args[0] else default_port, args[1] if args[1] else default_max_conns
+    cmdargs = parse_args()
+    port, max_conns = cmdargs[0] if cmdargs[0] else default_port, cmdargs[1] if cmdargs[1] else default_max_conns
 
     # initialize server
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
