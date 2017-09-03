@@ -187,8 +187,10 @@ def create_vault (raw_key, vault_name, cur_config, directory=MAINDIR+STOREDIR):
 # for adding a record to a vault
 # record info is : [record_name, record_value]
 def add_record (record_info, vault, encrypter, directory=MAINDIR+STOREDIR):
+    print(record_info)
     # strip of the end characters from the data it was sent surrounded with '`'
-    to_save = encrypter.encrypt(record_info[1][1:-1]).decode("utf-8")
+    to_save = encrypter.encrypt(record_info[1][:-1]).decode("utf-8")
+    print(record_info[0]+':'+to_save+';')
     write_file(directory+vault, record_info[0]+':'+to_save+';', "w+")
 
 
