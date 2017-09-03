@@ -1,0 +1,6 @@
+Fatal: 
+
+Bugs:
+
+    -- config file ordering is reversed for some reason (see get_config() and update_config to fix)
+

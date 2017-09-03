@@ -189,7 +189,7 @@ def create_vault (raw_key, vault_name, cur_config, directory=MAINDIR+STOREDIR):
 def add_record (record_info, vault, encrypter, directory=MAINDIR+STOREDIR):
     print(record_info)
     # strip of the end characters from the data it was sent surrounded with '`'
-    to_save = encrypter.encrypt(record_info[1][:-1]).decode("utf-8")
+    to_save = encrypter.encrypt(record_info[1]).decode("utf-8")
     print(record_info[0]+':'+to_save+';')
     write_file(directory+vault, record_info[0]+':'+to_save+';', "w+")
 
@@ -210,11 +210,12 @@ def get_record (record_name, vault, encrypter, directory=MAINDIR+STOREDIR):
 
 def del_record (name, vault, directory=MAINDIR+STOREDIR, cur_config=None):
     if not name and cur_config:
-        os.system("rm -rf %s" % (directory+name))
-        index = cur_config["vaults"].index(name)
+        os.system("rm -rf %s" % (directory+vault))
+        index = cur_config["vaults"].index(vault)
         del cur_config["vaults"][index]
         del cur_config["keys"][index]
         del cur_config["salts"][index]
+        return "Removed %s successfully." % vault
     elif name and not cur_config:
         records = read_file(directory+vault).split(';')
         for r, record in enumerate(records):
@@ -263,15 +264,17 @@ def handle_request (sock):
         return "Invalid password!"
     # if the length of the second argument is > 1 then it is adding a record
     encrypter = AESCipher(args[2] + config["salts"][index])
+    print(args[1])
     if len(args[1].strip().split('`')) > 2:
-        add_record(args[1].strip().split('`')[1], args[3], encrypter)
+        add_record(args[1].strip().split('`')[:-1], args[3], encrypter)
         return "Updated '" + args[1].strip().split('`', 1)[0] + "' successfully!"
     elif args[1].strip()[-1] == '0':
         return "The value stored in '" + args[1].strip()[:-1] + "' is :  " \
                 + get_record(args[1].strip()[:-1], args[3], encrypter)
     elif args[1].strip()[-1] == '1':
-        del_record(args[1].strip().split(' ')[0], False) if [1].strip().split(' ')[0] != '1' else del_record(args[3], True)
-        return (args[1].strip().split(' ')[0] if args[1].strip().split(' ')[0] != '1' else args[3]) + "has been removed."
+        del_record(args[1].strip()[:-1], args[3]) if args[1].strip()[0] != '1' else del_record('', args[3], cur_config=config)
+        update_config(config)
+        return (args[1].strip()[:-1] if args[1].strip()[:-1] != '1' else args[3]) + "has been removed."
 
     return False
 

@@ -140,13 +140,14 @@ def parse_args ():
             elif argv[arg] == "-g":
                 args[1] = argv[arg+1].strip() + '0'
             elif argv[arg] == "-d":
-                args[1] = (argv[arg+1].strip() if arg[arg+1].strip()[0] != '-' else '') + '1'
+                args[1] = (argv[arg+1].strip() if argv[arg+1].strip()[0] != '-' else '') + '1'
             elif argv[arg] == "-p":
                 args[3] = argv[arg+1].strip()
             elif argv[arg] == "-h":
                 args[4] = argv[arg+1].strip()
         args[2] = argv[-1].strip()
-    except Exception:
+    except Exception as e:
+            print(str(e))
             usage()
 
     if args[2] == 0 or args[4] == 0:
@@ -182,4 +183,4 @@ if __name__ == "__main__":
     main()
 
 
-LOGNAME
+# LOGNAME
