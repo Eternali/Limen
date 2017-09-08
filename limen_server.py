@@ -187,18 +187,15 @@ def create_vault (raw_key, vault_name, cur_config, directory=MAINDIR+STOREDIR):
 # for adding a record to a vault
 # record info is : [record_name, record_value]
 def add_record (record_info, vault, encrypter, directory=MAINDIR+STOREDIR):
-    print(record_info)
     # strip of the end characters from the data it was sent surrounded with '`'
     to_save = encrypter.encrypt(record_info[1]).decode("utf-8")
-    print(record_info[0]+':'+to_save+';')
-    write_file(directory+vault, record_info[0]+':'+to_save+';', "w+")
+    write_file(directory+vault, record_info[0]+':'+to_save+';', "a")
 
 
 # for getting a record from a vault
 def get_record (record_name, vault, encrypter, directory=MAINDIR+STOREDIR):
     vault_content = {}
     for record in read_file(directory+vault).split(';'):
-        print(record)
         if record:
             vault_content[record.split(':')[0]] = record.split(':')[1]
         if record_name in vault_content.keys():
@@ -264,7 +261,6 @@ def handle_request (sock):
         return "Invalid password!"
     # if the length of the second argument is > 1 then it is adding a record
     encrypter = AESCipher(args[2] + config["salts"][index])
-    print(args[1])
     if len(args[1].strip().split('`')) > 2:
         add_record(args[1].strip().split('`')[:-1], args[3], encrypter)
         return "Updated '" + args[1].strip().split('`', 1)[0] + "' successfully!"
