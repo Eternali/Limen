@@ -197,7 +197,6 @@ def get_record (record_name, vault, encrypter, directory=MAINDIR+STOREDIR):
     vault_content = {}
     for record in read_file(directory+vault).split(';'):
         if record:
-            print(record.split(':'))
             vault_content[record.split(':')[0]] = record.split(':')[1]
         if record_name in vault_content.keys():
             return encrypter.decrypt(vault_content[record_name].encode("utf-8"))
