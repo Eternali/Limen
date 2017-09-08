@@ -201,9 +201,9 @@ def get_record (record_name, vault, encrypter, directory=MAINDIR+STOREDIR):
             vault_content[record.split(':')[0]] = record.split(':')[1]
         if record_name in vault_content.keys():
             return encrypter.decrypt(vault_content[record_name].encode("utf-8"))
-        else:
-            write_log("Record not found in desired vault!")
-            return "Record not found in desired vault!"
+
+    write_log("Record not found in desired vault!")
+    return "Record not found in desired vault!"
 
 
 def del_record (name, vault, directory=MAINDIR+STOREDIR, cur_config=None):
